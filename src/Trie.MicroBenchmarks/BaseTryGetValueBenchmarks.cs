@@ -7,13 +7,15 @@ public abstract class BaseTryGetValueBenchmarks<T>
 {
     private FrozenDictionary<string, T> _frozen;
     private Trie<T> _trie;
+    private Trie<T> _compiledTrie;
     private string[] _positive;
     private string[] _negative;
 
     protected void Setup(Dictionary<string, T> dictionary, string[] positive, string[] negative)
     {
         _frozen = dictionary.ToFrozenDictionary(dictionary.Comparer);
-        _trie = dictionary.ToTrie(ReferenceEquals(dictionary.Comparer, StringComparer.OrdinalIgnoreCase));
+        _trie = dictionary.ToTrie(ReferenceEquals(dictionary.Comparer, StringComparer.OrdinalIgnoreCase), new () { Compiled = false });
+        _compiledTrie = dictionary.ToTrie(ReferenceEquals(dictionary.Comparer, StringComparer.OrdinalIgnoreCase), new () { Compiled = true });
         _positive = positive;
         _negative = negative;
     }
@@ -37,6 +39,15 @@ public abstract class BaseTryGetValueBenchmarks<T>
     }
 
     [Benchmark, IterationCount(BenchmarkConfig.IterationCount)]
+    public void Trie_Compiled_TryGetValue_True()
+    {
+        foreach (var item in _positive)
+        {
+            _compiledTrie.TryGetValue(item, out _);
+        }
+    }
+
+    [Benchmark, IterationCount(BenchmarkConfig.IterationCount)]
     public void FrozenDictionary_TryGetValue_False()
     {
         foreach (var item in _negative)
@@ -51,6 +62,15 @@ public abstract class BaseTryGetValueBenchmarks<T>
         foreach (var item in _negative)
         {
             _trie.TryGetValue(item, out _);
+        }
+    }
+
+    [Benchmark, IterationCount(BenchmarkConfig.IterationCount)]
+    public void Trie_Compiled_TryGetValue_False()
+    {
+        foreach (var item in _negative)
+        {
+            _compiledTrie.TryGetValue(item, out _);
         }
     }
 }

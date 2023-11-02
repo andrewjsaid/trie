@@ -114,7 +114,7 @@ internal class TrieEntriesAnalyzer<TCase> where TCase : struct, ICaseGenericSpec
         return (cntIndex, cntRShift, cntMask);
     }
 
-    private (int rShift, int mask, int length) OptimizeContinuationTable(List<IGrouping<int, (int index, string key)>> groups)
+    private static (int rShift, int mask, int length) OptimizeContinuationTable(List<IGrouping<int, (int index, string key)>> groups)
     {
         if (groups.Count == 1)
         {
